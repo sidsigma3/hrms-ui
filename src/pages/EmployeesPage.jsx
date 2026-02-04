@@ -38,10 +38,6 @@ const EmployeesPage = () => {
   });
 
 
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
-
   const fetchEmployees = useCallback(async () => {
     try {
       setLoading(true);
@@ -53,6 +49,12 @@ const EmployeesPage = () => {
       setLoading(false);
     }
  }, []);
+
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
+
+
 
 
 

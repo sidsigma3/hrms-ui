@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useCallback} from "react";
 import {
   Container,
   Snackbar,
@@ -31,10 +31,7 @@ const AttendancePage = () => {
     severity: "success",
   });
 
-  useEffect(() => {
-    fetchInitialData();
-  }, [fetchInitialData]);
-
+ 
   
   const fetchInitialData = useCallback(async () => {
     try {
@@ -69,6 +66,11 @@ const AttendancePage = () => {
       setLoading(false);
     }
   }, []);
+
+
+   useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
 
 
   const showSnackbar = (message, severity = "success") => {
