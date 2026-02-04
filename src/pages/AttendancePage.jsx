@@ -33,9 +33,9 @@ const AttendancePage = () => {
 
   useEffect(() => {
     fetchInitialData();
-  }, []);
+  }, [fetchInitialData]);
 
-  // ✅ LOAD EMPLOYEES + ATTENDANCE
+  
   const fetchInitialData = async () => {
     try {
       setLoading(true);
@@ -43,14 +43,13 @@ const AttendancePage = () => {
       const employeeData = await getEmployees();
       setEmployees(employeeData);
 
-      // Fetch attendance for ALL employees
+      
       let allRecords = [];
 
       await Promise.all(
         employeeData.map(async (emp) => {
           const records = await getAttendanceByEmployee(emp.employeeId);
 
-          // attach employee name
           const enriched = records.map((rec) => ({
             ...rec,
             employeeName: emp.fullName,
@@ -60,7 +59,7 @@ const AttendancePage = () => {
         })
       );
 
-      // sort latest first
+    
       allRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       setAttendanceRecords(allRecords);
@@ -71,7 +70,7 @@ const AttendancePage = () => {
     }
   };
 
-  // Snackbar helper
+
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({
       open: true,
@@ -84,7 +83,7 @@ const AttendancePage = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  // ✅ MARK ATTENDANCE
+ 
   const handleMarkAttendance = async (data) => {
     try {
       setLoading(true);
@@ -97,7 +96,7 @@ const AttendancePage = () => {
 
       showSnackbar("Attendance marked successfully");
 
-      // refresh
+     
       await fetchInitialData();
     } catch (error) {
       let message = "Failed to mark attendance";
@@ -116,7 +115,7 @@ const AttendancePage = () => {
     }
   };
 
-  // BONUS — Present days
+
   const calculatePresentDays = (employeeId) => {
     return attendanceRecords.filter(
       (rec) =>

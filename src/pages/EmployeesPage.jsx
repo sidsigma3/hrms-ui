@@ -40,7 +40,7 @@ const EmployeesPage = () => {
 
   useEffect(() => {
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
 
   const fetchEmployees = async () => {
     try {
@@ -152,7 +152,7 @@ const EmployeesPage = () => {
         </Button>
       </Box>
 
-      {/* CONTENT STATES */}
+     
 
       {loading ? (
         <Loader />
