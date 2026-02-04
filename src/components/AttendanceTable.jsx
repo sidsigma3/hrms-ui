@@ -37,8 +37,13 @@ const AttendanceTable = ({ records }) => {
               <TableCell>{record.employeeName}</TableCell>
               <TableCell>{record.employeeId}</TableCell>
               <TableCell>
-                {new Date(record.date).toLocaleDateString()}
+                {new Date(record.date).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "2-digit",
+                })}
               </TableCell>
+
               <TableCell>
                 <Chip
                   label={record.status}

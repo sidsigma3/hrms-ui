@@ -1,4 +1,4 @@
-import React, { useState, useEffect , useCallback} from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Container,
   Snackbar,
@@ -24,6 +24,7 @@ const AttendancePage = () => {
   const [employees, setEmployees] = useState([]);
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -31,8 +32,6 @@ const AttendancePage = () => {
     severity: "success",
   });
 
- 
-  
   const fetchInitialData = useCallback(async () => {
     try {
       setLoading(true);
@@ -40,7 +39,6 @@ const AttendancePage = () => {
       const employeeData = await getEmployees();
       setEmployees(employeeData);
 
-      
       let allRecords = [];
 
       await Promise.all(
@@ -56,7 +54,6 @@ const AttendancePage = () => {
         })
       );
 
-    
       allRecords.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       setAttendanceRecords(allRecords);
@@ -67,11 +64,9 @@ const AttendancePage = () => {
     }
   }, []);
 
-
-   useEffect(() => {
+  useEffect(() => {
     fetchInitialData();
   }, [fetchInitialData]);
-
 
   const showSnackbar = (message, severity = "success") => {
     setSnackbar({
@@ -85,7 +80,6 @@ const AttendancePage = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
- 
   const handleMarkAttendance = async (data) => {
     try {
       setLoading(true);
@@ -98,7 +92,6 @@ const AttendancePage = () => {
 
       showSnackbar("Attendance marked successfully");
 
-     
       await fetchInitialData();
     } catch (error) {
       let message = "Failed to mark attendance";
@@ -117,7 +110,6 @@ const AttendancePage = () => {
     }
   };
 
-
   const calculatePresentDays = (employeeId) => {
     return attendanceRecords.filter(
       (rec) =>
@@ -125,6 +117,28 @@ const AttendancePage = () => {
         rec.status === "Present"
     ).length;
   };
+
+  const calculateAbsentDays = (employeeId) => {
+    return attendanceRecords.filter(
+      (rec) =>
+        rec.employeeId === employeeId &&
+        rec.status === "Absent"
+    ).length;
+  };
+
+  const handleEmployeeClick = (employeeId) => {
+    if (selectedEmployee === employeeId) {
+      setSelectedEmployee(null);
+    } else {
+      setSelectedEmployee(employeeId);
+    }
+  };
+
+  const filteredRecords = selectedEmployee
+    ? attendanceRecords.filter(
+        (rec) => rec.employeeId === selectedEmployee
+      )
+    : attendanceRecords;
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -144,7 +158,6 @@ const AttendancePage = () => {
             isLoading={loading}
           />
 
-          {/* BONUS CARD */}
           <Box sx={{ mb: 4 }}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
               Total Present Days Per Employee
@@ -153,36 +166,58 @@ const AttendancePage = () => {
             <Grid container spacing={2}>
               {employees.map((employee) => (
                 <Grid item xs={12} sm={6} md={4} key={employee.employeeId}>
-                  <Paper sx={{ p: 2, textAlign: "center" }}>
+                  <Paper
+                    onClick={() =>
+                      handleEmployeeClick(employee.employeeId)
+                    }
+                    sx={{
+                      p: 2,
+                      textAlign: "center",
+                      cursor: "pointer",
+                      border:
+                        selectedEmployee === employee.employeeId
+                          ? "2px solid #1976d2"
+                          : "1px solid #e0e0e0",
+                      transition: "0.2s",
+                      "&:hover": {
+                        boxShadow: 6,
+                      },
+                    }}
+                  >
                     <Typography variant="body2" sx={{ mb: 1 }}>
                       {employee.fullName}
                     </Typography>
 
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: 700,
-                        color: "primary.main",
-                      }}
-                    >
-                      {calculatePresentDays(employee.employeeId)} days
-                    </Typography>
+                    <Box>
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: 700, color: "success.main" }}
+                      >
+                        Present: {calculatePresentDays(employee.employeeId)}
+                      </Typography>
+
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: 700, color: "error.main" }}
+                      >
+                        Absent: {calculateAbsentDays(employee.employeeId)}
+                      </Typography>
+                    </Box>
                   </Paper>
                 </Grid>
               ))}
             </Grid>
           </Box>
 
-          {/* TABLE */}
           <Box sx={{ mb: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
               Attendance Records
             </Typography>
 
-            {attendanceRecords.length === 0 ? (
+            {filteredRecords.length === 0 ? (
               <EmptyState message="No attendance records found." />
             ) : (
-              <AttendanceTable records={attendanceRecords} />
+              <AttendanceTable records={filteredRecords} />
             )}
           </Box>
         </>
