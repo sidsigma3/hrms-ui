@@ -36,7 +36,7 @@ const AttendancePage = () => {
   }, [fetchInitialData]);
 
   
-  const fetchInitialData = async () => {
+  const fetchInitialData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -68,7 +68,7 @@ const AttendancePage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
 
   const showSnackbar = (message, severity = "success") => {

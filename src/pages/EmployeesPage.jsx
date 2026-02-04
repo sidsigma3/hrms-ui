@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useCallback} from "react";
 import {
   Container,
   Button,
@@ -42,7 +42,7 @@ const EmployeesPage = () => {
     fetchEmployees();
   }, [fetchEmployees]);
 
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getEmployees();
@@ -52,7 +52,8 @@ const EmployeesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+ }, []);
+
 
 
   const showSnackbar = (message, severity = "success") => {
